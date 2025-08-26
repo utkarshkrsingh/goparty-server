@@ -6,9 +6,9 @@ services:
         image: postgres
         restart: always
         environment:
-            POSTGRES_USER: root
-            POSTGRES_PASSWORD: root
-            POSTGRES_DB: test_db
+            POSTGRES_USER: goparty_manage
+            POSTGRES_PASSWORD: goparty_dbs
+            POSTGRES_DB: goparty_db
         ports:
             - "5432:5432"
     pgadmin:

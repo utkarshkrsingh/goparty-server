@@ -1,4 +1,4 @@
-// Package roomcode provides functionalities for room code management
+// Package roomcode generates the room code for room
 package roomcode
 
 import (
@@ -8,9 +8,13 @@ import (
 
 // GenerateCode generates a random alphanumeric code of a specified length (6 characters)
 func GenerateCode() (string, error) {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	code := make([]byte, 6)
-	for i := range 6 {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	code := make([]byte, 7)
+	for i := range 7 {
+		if i == 3 {
+			code[i] = '-'
+			continue
+		}
 		idx, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
 		if err != nil {
 			return "", err
