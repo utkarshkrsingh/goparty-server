@@ -1,14 +1,15 @@
 package routehandlers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/utkarshkrsingh/goparty/internal/db"
 	"github.com/utkarshkrsingh/goparty/internal/initializer"
+	"github.com/utkarshkrsingh/goparty/internal/repositories"
+	"github.com/utkarshkrsingh/goparty/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,9 +28,9 @@ func Login(ctx *gin.Context) {
 	}
 
 	// Look for requested user
-	var user db.Users
-	dbQuery := `SELECT * FROM users WHERE email = $1`
-	if err := initializer.DB.Get(&user, dbQuery, body.Email); err != nil {
+	repositoryManager := repositories.PostgresUserRepository{DB: initializer.DB}
+	user, err := repositoryManager.FindByEmail(body.Email)
+	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"error": "User not found: " + err.Error(),
 		})
@@ -38,34 +39,15 @@ func Login(ctx *gin.Context) {
 
 	// Compare sent in password with saved user password hash
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password)); err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid email or password: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusUnauthorized, fmt.Sprintf("Invalid email or password: %v", err.Error()))
 		return
 	}
 
 	// Generate a JWT token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":      user.ID,
-		"username": user.UserName,
-		"email":    user.Email,
-		"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(),
-	})
-
-	// Sign and get the complete encoded token as a string using the secret-key
-	secretKey := os.Getenv("JWT_SECRET")
-	if secretKey == "" {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Server misconfigured",
-		})
-		return
-	}
-
-	tokenString, err := token.SignedString([]byte(secretKey))
+	jwtManager := utils.NewJWTManager(os.Getenv("JWT_SECRET"), time.Hour*24*30)
+	tokenString, err := jwtManager.GenerateToken(user.ID, user.UserName, user.Email)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to create token: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusInternalServerError, fmt.Sprintf("Failed to create token: %v", err.Error()))
 		return
 	}
 

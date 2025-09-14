@@ -21,7 +21,7 @@ func RequireAuth(ctx *gin.Context) {
 	}
 
 	// Decode/validate it
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
