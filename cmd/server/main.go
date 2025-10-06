@@ -9,8 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/utkarshkrsingh/goparty/internal/initializer"
-	"github.com/utkarshkrsingh/goparty/internal/middleware"
-	routehandlers "github.com/utkarshkrsingh/goparty/internal/routeHandlers"
+	"github.com/utkarshkrsingh/goparty/internal/routes"
 )
 
 func init() {
@@ -32,11 +31,8 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	router.GET("/create-room", middleware.RequireAuth, routehandlers.CreateRoom)
-	router.POST("/signup", routehandlers.Signup)
-	router.POST("/login", routehandlers.Login)
-	router.POST("/logout", routehandlers.Logout)
-	router.GET("/validate", middleware.RequireAuth, routehandlers.Validate)
+	// Handle Incoming Requests
+	routes.HandleRoutes(router)
 
 	// Health check
 	router.GET("/ping-db", func(ctx *gin.Context) {

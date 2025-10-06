@@ -1,16 +1,15 @@
-// Package routehandlers handles the request comming to each endpoint
-package routehandlers
+package routes
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	roomcode "github.com/utkarshkrsingh/goparty/internal/roomCode"
+	"github.com/utkarshkrsingh/goparty/internal/utils"
 )
 
 // CreateRoom handles the request to the "/create-room" endpoint
-func CreateRoom(c *gin.Context) {
-	roomCode, err := roomcode.GenerateCode()
+func createRoom(c *gin.Context) {
+	roomCode, err := utils.GenerateCode()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Internal Server Code: " + err.Error(),

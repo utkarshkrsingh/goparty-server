@@ -1,12 +1,10 @@
-// Package roomcode generates the room code for room
-package roomcode
+package utils
 
 import (
 	"crypto/rand"
 	"math/big"
 )
 
-// GenerateCode generates a random alphanumeric code of a specified length (6 characters)
 func GenerateCode() (string, error) {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	code := make([]byte, 7)

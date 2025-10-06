@@ -3,14 +3,6 @@ package db
 
 import "time"
 
-type Users struct {
-	ID        string    `db:"id" json:"id"`
-	UserName  string    `db:"username" json:"username"`
-	Email     string    `db:"email" json:"email"`
-	Password  string    `db:"password_hash" json:"-"`
-	CreatedAt time.Time `db:"created_at" json:"createdAt"`
-}
-
 type Room struct {
 	ID        string    `db:"id" json:"id"`
 	RoomCode  string    `db:"rome_code" json:"roomCode"`

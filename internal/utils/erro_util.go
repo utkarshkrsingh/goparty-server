@@ -1,3 +1,4 @@
+// Package utils handles utilities working as backbones
 package utils
 
 import (
@@ -12,3 +13,4 @@ type APIError struct {
 func RespondError(ctx *gin.Context, status int, message string) {
 	ctx.JSON(status, APIError{Code: status, Message: message})
 }
+
