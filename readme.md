@@ -1,7 +1,7 @@
 ## DotEnv File
 
 - This is the structure of `.env` file
-``````
+
 ```
 APP_PORT=<value>
 
