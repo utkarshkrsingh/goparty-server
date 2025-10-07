@@ -18,18 +18,14 @@ func login(ctx *gin.Context) {
 	var body = db.Users{}
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusBadRequest, fmt.Sprintf("Unable to read body: %v", err.Error()))
 		return
 	}
 
 	// Look for requested user
 	user, err := body.FindByMail()
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "User not found: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusNotFound, fmt.Sprintf("User not found: %v", err.Error()))
 		return
 	}
 
@@ -67,26 +63,20 @@ func signup(ctx *gin.Context) {
 	var body = db.Users{}
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusBadRequest, fmt.Sprintf("Failed to read body: %v", err.Error()))
 		return
 	}
 	fmt.Printf("Data: %v, %v and %v", body.UserName, body.Email, body.Password)
 
 	if body.UserName == "" || body.Email == "" || body.Password == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Username, Email and Password are required",
-		})
+		utils.RespondError(ctx, http.StatusBadRequest, "Username, Email and Password are required")
 		return
 	}
 
 	// Hash the password
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to hash password: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusBadRequest, fmt.Sprintf("Failed to hash password: %v", err.Error()))
 		return
 	}
 
@@ -94,9 +84,7 @@ func signup(ctx *gin.Context) {
 	body.Password = string(hash)
 	err = body.CreateUser()
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to create user: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusBadRequest, fmt.Sprintf("Failed to create user: %v", err.Error()))
 		return
 	}
 
@@ -126,9 +114,7 @@ func logout(ctx *gin.Context) {
 func validate(ctx *gin.Context) {
 	user, ok := ctx.Get("user")
 	if !ok {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"error": "User not exists",
-		})
+		utils.RespondError(ctx, http.StatusNotFound, "User not exists")
 		return
 	}
 

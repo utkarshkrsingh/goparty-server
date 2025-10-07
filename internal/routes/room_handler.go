@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,15 +9,13 @@ import (
 )
 
 // CreateRoom handles the request to the "/create-room" endpoint
-func createRoom(c *gin.Context) {
+func createRoom(ctx *gin.Context) {
 	roomCode, err := utils.GenerateCode()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal Server Code: " + err.Error(),
-		})
+		utils.RespondError(ctx, http.StatusInternalServerError, fmt.Sprintf("Internal Server Error: %v", err.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"roomCode": roomCode,
 	})
 }
